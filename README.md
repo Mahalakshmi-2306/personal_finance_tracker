@@ -48,4 +48,5 @@
 * Resume or portfolio projects
 
 ---
+![maha pic](https://github.com/user-attachments/assets/9c0b7241-e41d-4c53-b278-9f956a176dbb)
 
