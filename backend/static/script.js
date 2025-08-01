@@ -53,24 +53,33 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function renderTransactions(transactions) {
-        table.innerHTML = "";
-        transactions.forEach((tx) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${tx.amount}</td>
-                <td>${tx.type}</td>
-                <td>${tx.category}</td>
-                <td>${formatDateToIST(tx.date)}</td>
-                <td>${tx.note || ""}</td>
-                <td>${formatToIST(tx.timestamp)}</td>
-                <td>
-                    <button onclick='editTransaction(${JSON.stringify(tx)})'>Edit</button>
-                    <button onclick='deleteTransaction(${tx.id})'>Delete</button>
-                </td>
-            `;
-            table.appendChild(row);
-        });
-    }
+    table.innerHTML = "";
+    transactions.forEach((tx) => {
+        const row = document.createElement("tr");
+
+        // Add color class based on transaction type
+        if (tx.type === "Income") {
+            row.classList.add("income-row");
+        } else if (tx.type === "Expense") {
+            row.classList.add("expense-row");
+        }
+
+        row.innerHTML = `
+            <td>₹${tx.amount}</td>
+            <td>${tx.type}</td>
+            <td>${tx.category}</td>
+            <td>${formatDateToIST(tx.date)}</td>
+            <td>${tx.note || ""}</td>
+            <td>${formatToIST(tx.timestamp)}</td>
+            <td>
+                <button onclick='editTransaction(${JSON.stringify(tx)})'>Edit</button>
+                <button onclick='deleteTransaction(${tx.id})'>Delete</button>
+            </td>
+        `;
+        table.appendChild(row);
+    });
+}
+
     function applyFilters(transactions) {
         const dateFilter = document.getElementById("filterDate").value;
         const monthFilter = document.getElementById("filterMonth").value;

@@ -4,10 +4,124 @@
     <meta charset="UTF-8">
     <title>Dashboard | Finance Tracker</title>
     <link rel="stylesheet" href="/static/style.css">
-    
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600&display=swap" rel="stylesheet">
+    <style>
+        .hero-title {
+            text-align: center;
+            padding: 2rem 0 1rem;
+        }
+        .hero-title h1 {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 2.8rem;
+            margin: 0;
+            color: #444;
+        }
+        .hero-title .tagline {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            color: #777;
+            margin-top: 0.5rem;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: #007bff;
+            color: white;
+        }
+        header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        nav a, nav button {
+            margin-left: 1rem;
+            color: white;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .background-brand-text {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 6rem;
+            color: rgba(0, 0, 0, 0.04);
+            pointer-events: none;
+            user-select: none;
+            white-space: nowrap;
+            z-index: 0;
+        }
+        body.dark .background-brand-text {
+            color: rgba(255, 255, 255, 0.05);
+        }
+        main {
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        .form-section,
+        .table-section {
+            margin-bottom: 3rem;
+        }
+        h2 {
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 1rem;
+        }
+        form input,
+        form select,
+        form button {
+            margin: 0.5rem 0.5rem 1rem 0;
+        }
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .filter-section input,
+        .filter-section select,
+        .filter-section button {
+            margin: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
+
 <body>
+    <!-- Hero Title (Top Center) -->
+    <section class="hero-title">
+        <h1>Budget Buddy</h1>
+        <p class="tagline">Track, plan, and grow smarter 🌱</p>
+    </section>
+
+    <!-- Navigation -->
     <header>
         <h1>Finance Tracker</h1>
         <nav>
@@ -17,7 +131,12 @@
         </nav>
     </header>
 
+    <!-- Background Text -->
+    <div class="background-brand-text">Budget Buddy</div>
+
+    <!-- Main Content -->
     <main>
+        <!-- Add Transaction Section -->
         <section class="form-section">
             <h2>Add Transaction</h2>
             <form id="transactionForm">
@@ -31,13 +150,12 @@
                 <input type="text" name="note" id="note" placeholder="Note (optional)">
                 <button type="submit">Add</button>
             </form>
-
         </section>
 
-
-
+        <!-- Transaction Table -->
         <section class="table-section">
             <h2>Your Transactions</h2>
+
             <div class="filter-section">
                 <label for="filterDate">Date:</label>
                 <input type="date" id="filterDate">
@@ -59,7 +177,6 @@
                     <option value="12">Dec</option>
                 </select>
 
-
                 <label for="filterYear">Year:</label>
                 <input type="number" id="filterYear" placeholder="e.g. 2025">
 
@@ -70,26 +187,20 @@
                 <button id="clearFilters">Clear</button>
             </div>
 
-
-                <button id="applyFilters">Apply Filters</button>
-                <button id="clearFilters">Clear</button>
-            </div>
-
             <table id="transactionsTable">
-  <thead>
-    <tr>
-      <th>Amount</th>
-      <th>Type</th>
-      <th>Category</th>
-      <th>Date</th>
-      <th>Note</th>
-      <th>Timestamp</th> <!-- ✅ Correct position -->
-      <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody></tbody>
-    </table>
-
+                <thead>
+                    <tr>
+                        <th>Amount</th>
+                        <th>Type</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Note</th>
+                        <th>Timestamp</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </section>
     </main>
 
