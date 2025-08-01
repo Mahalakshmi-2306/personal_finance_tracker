@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Summary | Finance Tracker</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .charts-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .charts-section canvas {
+            max-width: 500px;
+            max-height: 400px;
+        }
+
+        .filter-section {
+            margin: 1em 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Finance Summary</h1>
+        <nav>
+            <a href="/dashboard">Dashboard</a>
+            <button id="themeToggle">🌓</button>
+            <a href="/logout">Logout</a>
+        </nav>
+    </header>
+
+    <main class="summary-section">
+
+        <!-- Unified Filter Section -->
+        <div class="filter-section">
+            <label for="monthFilter">Month:</label>
+            <select id="monthFilter">
+                <option value="">All</option>
+                <option value="0">January</option>
+                <option value="1">February</option>
+                <option value="2">March</option>
+                <option value="3">April</option>
+                <option value="4">May</option>
+                <option value="5">June</option>
+                <option value="6">July</option>
+                <option value="7">August</option>
+                <option value="8">September</option>
+                <option value="9">October</option>
+                <option value="10">November</option>
+                <option value="11">December</option>
+            </select>
+
+            <label for="yearFilter">Year:</label>
+            <select id="yearFilter">
+                <option value="">All</option>
+                <!-- JS will populate -->
+            </select>
+        </div>
+
+        <div class="summary-box">
+            <h2>Summary</h2>
+            <div id="summaryData"></div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-section">
+            <canvas id="pieChart"></canvas>
+            <canvas id="barChart"></canvas>
+            <canvas id="lineChart"></canvas>
+        </div>
+    </main>
+
+    <script>
+    let allTransactions = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Theme toggling
+        if (localStorage.getItem("darkMode") === "true") {
+            document.body.classList.add("dark");
+        }
+
+        document.getElementById("themeToggle").addEventListener("click", () => {
+            document.body.classList.toggle("dark");
+            localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+        });
+
+        fetch('/transactions')
+            .then(res => res.json())
+            .then(data => {
+                allTransactions = data;
+                populateYearFilter();
+                updateSummaryAndCharts(); // Initial render
+            });
+
+        document.getElementById("monthFilter").addEventListener("change", updateSummaryAndCharts);
+        document.getElementById("yearFilter").addEventListener("change", updateSummaryAndCharts);
+    });
+
+    function populateYearFilter() {
+        const years = [...new Set(allTransactions.map(tx => new Date(tx.date).getFullYear()))].sort((a, b) => b - a);
+        const yearSelect = document.getElementById("yearFilter");
+
+        years.forEach(year => {
+            const option = document.createElement("option");
+            option.value = year;
+            option.textContent = year;
+            yearSelect.appendChild(option);
+        });
+    }
+
+    function updateSummaryAndCharts() {
+        const selectedMonth = document.getElementById("monthFilter").value;
+        const selectedYear = document.getElementById("yearFilter").value;
+
+        const filteredData = allTransactions.filter(tx => {
+            const txDate = new Date(tx.date);
+            const txMonth = txDate.getMonth();
+            const txYear = txDate.getFullYear();
+
+            return (selectedMonth === "" || txMonth == selectedMonth) &&
+                   (selectedYear === "" || txYear == selectedYear);
+        });
+
+        let income = 0, expense = 0;
+        filteredData.forEach(tx => {
+            const amt = parseFloat(tx.amount);
+            if (tx.type === 'Income') income += amt;
+            else expense += amt;
+        });
+
+        document.getElementById("summaryData").innerHTML = `
+            <p>Total Income: ₹${income.toFixed(2)}</p>
+            <p>Total Expense: ₹${expense.toFixed(2)}</p>
+            <p><strong>Net Balance: ₹${(income - expense).toFixed(2)}</strong></p>
+        `;
+
+        // === Destroy previous charts if they exist ===
+        if (window.pieChartInstance) window.pieChartInstance.destroy();
+        if (window.barChartInstance) window.barChartInstance.destroy();
+        if (window.lineChartInstance) window.lineChartInstance.destroy();
+
+        // === Pie Chart ===
+        window.pieChartInstance = new Chart(document.getElementById("pieChart"), {
+            type: 'pie',
+            data: {
+                labels: ['Income', 'Expense'],
+                datasets: [{
+                    data: [income, expense],
+                    backgroundColor: ['#4caf50', '#f44336']
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#333',
+                            font: { size: 14 }
+                        }
+                    }
+                }
+            }
+        });
+
+        // === Bar Chart (Expense by Category) ===
+        const categoryTotals = {};
+        filteredData.forEach(tx => {
+            if (tx.type === 'Expense') {
+                if (!categoryTotals[tx.category]) categoryTotals[tx.category] = 0;
+                categoryTotals[tx.category] += parseFloat(tx.amount);
+            }
+        });
+
+        window.barChartInstance = new Chart(document.getElementById("barChart"), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(categoryTotals),
+                datasets: [{
+                    label: 'Expenses',
+                    data: Object.values(categoryTotals),
+                    backgroundColor: '#2196f3'
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#555' }
+                    },
+                    x: {
+                        ticks: { color: '#555' }
+                    }
+                },
+                plugins: {
+                    legend: { labels: { color: '#333' } }
+                }
+            }
+        });
+
+        // === Line Chart (Monthly Expense Trend) ===
+        const monthlyExpenses = new Array(12).fill(0);
+        allTransactions.forEach(tx => {
+            if (tx.type === 'Expense') {
+                const date = new Date(tx.date);
+                const month = date.getMonth();
+                const year = date.getFullYear();
+
+                if ((selectedYear === "" || year == selectedYear)) {
+                    monthlyExpenses[month] += parseFloat(tx.amount);
+                }
+            }
+        });
+
+        window.lineChartInstance = new Chart(document.getElementById("lineChart"), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Monthly Expense Trend',
+                    data: monthlyExpenses,
+                    borderColor: '#ff9800',
+                    backgroundColor: 'rgba(255, 152, 0, 0.2)',
+                    tension: 0.3,
+                    fill: true,
+                    pointBackgroundColor: '#ff5722',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#555' }
+                    },
+                    x: {
+                        ticks: { color: '#555' }
+                    }
+                },
+                plugins: {
+                    legend: { labels: { color: '#333' } }
+                }
+            }
+        });
+    }
+    </script>
+</body>
+</html>

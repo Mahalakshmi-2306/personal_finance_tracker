@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Budget Buddy - Create Your Account</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #ffe0ec, #c9e4ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .register-container {
+            background: white;
+            display: flex;
+            flex-direction: row;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .register-image {
+            flex: 1;
+            background: url('/static/rupee-register.jpg') no-repeat center center;
+            background-size: contain;
+            background-color: #f7f7f7;
+        }
+
+        .register-box {
+            flex: 1;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        .register-box h2 {
+            margin-bottom: 25px;
+            color: #333;
+            text-align: center;
+        }
+
+        .register-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        .register-box button {
+            width: 100%;
+            padding: 12px;
+            background-color: #6a82fb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        .register-box button:hover {
+            background-color: #4b65c2;
+        }
+
+        .register-box p {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .register-box a {
+            color: #6a82fb;
+            text-decoration: none;
+        }
+
+        .register-box a:hover {
+            text-decoration: underline;
+        }
+
+        /* Optional: Cute emoji rupee */
+        .register-box h2::before {
+            content: "📝 ";
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-image"></div>
+        <div class="register-box">
+            <h2>Create Your Account</h2>
+            <form method="POST" action="/register">
+                <input type="text" name="username" placeholder="👤 Choose a Username" required />
+                <input type="password" name="password" placeholder="🔒 Create a Password" required />
+                <button type="submit">Register</button>
+            </form>
+            <p>Already have an account? <a href="/login">Login</a></p>
+        </div>
+    </div>
+</body>
+</html>
